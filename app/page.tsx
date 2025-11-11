@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,10 +14,17 @@ type Message = {
 };
 
 export default function ChatWidget() {
-  // The chat will always be open when iframe loads
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
+
+  // Ref for messages container
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+  // Scroll to bottom whenever messages or loading changes
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages, loading]);
 
   const sendMessage = async () => {
     if (!query.trim()) return;
@@ -84,6 +91,9 @@ export default function ChatWidget() {
               <div className="dot bg-gray-400 animate-bounce [animation-delay:0.4s]" />
             </div>
           )}
+
+          {/* Invisible div to scroll into view */}
+          <div ref={messagesEndRef} />
         </div>
 
         {/* Input */}
