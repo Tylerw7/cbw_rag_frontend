@@ -1,80 +1,77 @@
 //https://cbw-rag-frontend.vercel.app/chat
 // app/widget/route.ts
-export const runtime = "edge";
+import { NextResponse } from "next/server";
 
 export async function GET() {
-  const js = `
+  const jsCode = `
 (function() {
-  const CHAT_URL = lhttps://cbw-rag-frontend.vercel.app/chat; // iframe URL
-  const IFRAME_ID = 'my-site-chat-iframe';
+  // --- Prevent duplicates ---
+  if (window.__CBW_WIDGET_LOADED__) return;
+  window.__CBW_WIDGET_LOADED__ = true;
 
-  if (window.__myChatWidgetInjected) return;
-  window.__myChatWidgetInjected = true;
-
-  // Inline MessageCircle SVG (Lucide style)
-  const messageCircleSVG = '<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.84-1.3L3 20l1.3-4.84A9.863 9.863 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>';
-
-  // Create floating button
-  const btn = document.createElement('div');
-  btn.id = 'my-site-chat-button';
-  btn.style.position = 'fixed';
-  btn.style.right = '24px';
-  btn.style.bottom = '24px';
-  btn.style.width = '56px';
-  btn.style.height = '56px';
-  btn.style.borderRadius = '50%';
-  btn.style.background = '#2563eb';
-  btn.style.display = 'flex';
-  btn.style.alignItems = 'center';
-  btn.style.justifyContent = 'center';
-  btn.style.cursor = 'pointer';
-  btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
-  btn.style.zIndex = '2147483647';
-  btn.innerHTML = messageCircleSVG; // inject SVG
-  document.body.appendChild(btn);
-
-  // Create iframe (hidden by default)
+  // --- Chat iframe ---
   const iframe = document.createElement('iframe');
-  iframe.id = IFRAME_ID;
-  iframe.src = CHAT_URL;
-  iframe.style.position = 'fixed';
-  iframe.style.right = '24px';
-  iframe.style.bottom = '100px';
-  iframe.style.width = '340px';
-  iframe.style.height = '520px';
-  iframe.style.border = 'none';
-  iframe.style.borderRadius = '12px';
-  iframe.style.boxShadow = '0 10px 30px rgba(0,0,0,0.2)';
-  iframe.style.zIndex = '2147483647';
-  iframe.style.display = 'none';
-  iframe.allow = 'clipboard-write; microphone; camera';
+  iframe.src = "https://cbw-rag-frontend.vercel.app/chat"; // 👈 your deployed chat page
+  iframe.style.position = "fixed";
+  iframe.style.bottom = "90px";
+  iframe.style.right = "30px";
+  iframe.style.width = "400px";
+  iframe.style.height = "520px";
+  iframe.style.border = "none";
+  iframe.style.borderRadius = "16px";
+  iframe.style.boxShadow = "0 8px 24px rgba(0,0,0,0.2)";
+  iframe.style.display = "none";
+  iframe.style.zIndex = "2147483647";
+  iframe.style.background = "transparent";
   document.body.appendChild(iframe);
 
-  // Toggle iframe on click
-  btn.addEventListener('click', function(e) {
+  // --- Floating button ---
+  const button = document.createElement('button');
+  button.innerHTML = \`
+    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none"
+      stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="lucide lucide-message-circle">
+      <path d="M3 20a5 5 0 0 1 1-2 9 9 0 1 1 3 3 5 5 0 0 1-2 1l-2 1Z"/>
+    </svg>\`;
+  button.style.position = "fixed";
+  button.style.bottom = "20px";
+  button.style.right = "30px";
+  button.style.width = "64px";
+  button.style.height = "64px";
+  button.style.borderRadius = "50%";
+  button.style.border = "none";
+  button.style.background = "#2563eb";
+  button.style.color = "white";
+  button.style.display = "flex";
+  button.style.alignItems = "center";
+  button.style.justifyContent = "center";
+  button.style.cursor = "pointer";
+  button.style.zIndex = "2147483647";
+  button.style.boxShadow = "0 4px 12px rgba(0,0,0,0.3)";
+  button.style.transition = "transform 0.2s ease";
+  button.onmouseenter = () => button.style.transform = "scale(1.1)";
+  button.onmouseleave = () => button.style.transform = "scale(1)";
+
+  // --- Toggle chat iframe ---
+  button.addEventListener('click', (e) => {
     e.stopPropagation();
-    const isVisible = iframe.style.display === 'block';
-    iframe.style.display = isVisible ? 'none' : 'block';
+    const visible = iframe.style.display === "block";
+    iframe.style.display = visible ? "none" : "block";
   });
 
-  // Close when clicking outside
-  window.addEventListener('click', function(ev) {
-    if (!iframe.contains(ev.target) && ev.target !== btn) {
-      iframe.style.display = 'none';
+  // --- Close chat when clicking outside ---
+  window.addEventListener('click', (event) => {
+    if (!iframe.contains(event.target) && event.target !== button) {
+      iframe.style.display = "none";
     }
   });
 
-  // Optional: listen for postMessage to close iframe
-  window.addEventListener('message', (evt) => {
-    if (evt.data === 'close-chat') iframe.style.display = 'none';
-  });
+  // --- Append button to body ---
+  document.body.appendChild(button);
 })();
-  `.trim();
+  `;
 
-  return new Response(js, {
-    headers: {
-      'content-type': 'application/javascript; charset=utf-8',
-      'cache-control': 'public, max-age=60'
-    },
+  return new NextResponse(jsCode, {
+    headers: { "Content-Type": "application/javascript" },
   });
 }
