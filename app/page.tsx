@@ -29,7 +29,7 @@ export default function ChatWidget() {
     setLoading(true);
 
     try {
-      const resp = await axios.post("http://localhost:8000/chat", {
+      const resp = await axios.post("https://cbw-lead-capture-agent-b73dbd5e109e.herokuapp.com/chat", {
         query,
         history: messages,
       });
