@@ -5,7 +5,7 @@ export const runtime = "edge";
 export async function GET() {
   const js = `
 (function() {
-  const CHAT_URL = location.origin + '/chat'; // iframe URL
+  const CHAT_URL = lhttps://cbw-rag-frontend.vercel.app/chat; // iframe URL
   const IFRAME_ID = 'my-site-chat-iframe';
 
   if (window.__myChatWidgetInjected) return;
