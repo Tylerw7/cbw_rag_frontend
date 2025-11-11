@@ -11,7 +11,7 @@ export async function GET() {
 
   // --- Chat iframe ---
   const iframe = document.createElement('iframe');
-  iframe.src = "https://cbw-rag-frontend.vercel.app/chat"; // 👈 your deployed chat page
+  iframe.src = "https://cbw-rag-frontend.vercel.app/"; // 👈 your deployed chat page
   iframe.style.position = "fixed";
   iframe.style.bottom = "90px";
   iframe.style.right = "30px";
