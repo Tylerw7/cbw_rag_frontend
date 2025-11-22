@@ -15,7 +15,9 @@ type Message = {
 
 export default function ChatWidget() {
   const [query, setQuery] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>([
+    {role: "assistant", text: "Hi there! How can I assist you today? I’d be happy to answer any questions or help you schedule a consultation or appointment."}
+  ]);
   const [loading, setLoading] = useState(false);
 
   // Ref for messages container
