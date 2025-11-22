@@ -19,7 +19,7 @@ export default function ChatWidget() {
     {role: "assistant", text: "Hi there! How can I assist you today? I’d be happy to answer any questions or help you schedule a consultation or appointment."}
   ]);
   const [loading, setLoading] = useState(false);
-  const [sessionId, setSessionId] = useState<string | null>(null);
+  
 
 
 
@@ -32,14 +32,7 @@ export default function ChatWidget() {
   }, [messages, loading]);
 
 
-  useEffect(() => {
-    let existing = localStorage.getItem("chatSessionId");
-    if (!existing) {
-      existing = crypto.randomUUID();
-      localStorage.setItem("chatSessionId", existing)
-    }
-    setSessionId(existing)
-  },[]);
+  
 
 
 
@@ -58,7 +51,7 @@ export default function ChatWidget() {
     try {
       const resp = await axios.post(
         'https://cbw-lead-capture-agent-b73dbd5e109e.herokuapp.com/chat',
-        { query, history: messages, session_id: sessionId }
+        { query, history: messages }
       );
 
       setMessages((m) => [
